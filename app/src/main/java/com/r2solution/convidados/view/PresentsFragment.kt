@@ -8,13 +8,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.r2solution.convidados.databinding.FragmentGalleryBinding
+import com.r2solution.convidados.databinding.FragmentPresentBinding
 import com.r2solution.convidados.viewmodel.PresentsViewModel
 
 class PresentsFragment : Fragment() {
 
     private lateinit var presentsViewModel: PresentsViewModel
-    private var _binding: FragmentGalleryBinding? = null
+    private var _binding: FragmentPresentBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -28,7 +28,7 @@ class PresentsFragment : Fragment() {
         presentsViewModel =
             ViewModelProvider(this).get(PresentsViewModel::class.java)
 
-        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        _binding = FragmentPresentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textGallery

@@ -8,13 +8,20 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.r2solution.convidados.R
 import com.r2solution.convidados.databinding.FragmentAllBinding
+import com.r2solution.convidados.view.adapter.GuestAdapter
 import com.r2solution.convidados.viewmodel.AllGuestsViewModel
 
 class AllGuestsFragment : Fragment() {
 
     private lateinit var allGuestsViewModel: AllGuestsViewModel
+    private lateinit var recycler: RecyclerView
     private var _binding: FragmentAllBinding? = null
+    private val mAdapter: GuestAdapter = GuestAdapter()
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -30,12 +37,28 @@ class AllGuestsFragment : Fragment() {
 
         _binding = FragmentAllBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        //1 - Obter Recycler
+        recycler = root.findViewById(R.id.recycler_all_guests)
 
-        val textView: TextView = binding.textHome
-        allGuestsViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
+        //2 - Definir layout
+        recycler.layoutManager = LinearLayoutManager(context)
+
+        //3 - Definir um adapter
+        recycler.adapter = mAdapter
+
+        observer()
+
+        allGuestsViewModel.load()
+
+
         return root
+    }
+
+    private fun observer() {
+        allGuestsViewModel.guestList.observe(viewLifecycleOwner, Observer {
+            mAdapter.updateGuests(it)
+
+        })
     }
 
     override fun onDestroyView() {
