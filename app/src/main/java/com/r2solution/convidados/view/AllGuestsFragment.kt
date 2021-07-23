@@ -1,5 +1,6 @@
 package com.r2solution.convidados.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,16 +13,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.r2solution.convidados.R
 import com.r2solution.convidados.databinding.FragmentAllBinding
+import com.r2solution.convidados.service.constants.GuestConstants
 import com.r2solution.convidados.view.adapter.GuestAdapter
+import com.r2solution.convidados.view.listener.GuestListener
 import com.r2solution.convidados.viewmodel.AllGuestsViewModel
 
 class AllGuestsFragment : Fragment() {
 
-    private lateinit var allGuestsViewModel: AllGuestsViewModel
+    private lateinit var mViewModel: AllGuestsViewModel
     private lateinit var recycler: RecyclerView
     private var _binding: FragmentAllBinding? = null
     private val mAdapter: GuestAdapter = GuestAdapter()
-
+    private lateinit var mListener: GuestListener
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -32,11 +35,12 @@ class AllGuestsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        allGuestsViewModel =
+        mViewModel =
             ViewModelProvider(this).get(AllGuestsViewModel::class.java)
 
         _binding = FragmentAllBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
         //1 - Obter Recycler
         recycler = root.findViewById(R.id.recycler_all_guests)
 
@@ -46,17 +50,37 @@ class AllGuestsFragment : Fragment() {
         //3 - Definir um adapter
         recycler.adapter = mAdapter
 
+        mListener = object: GuestListener{
+            override fun onClick(id: Int) {
+                val intent = Intent(context, GuestFormActivity::class.java)
+                val bundle = Bundle()
+
+                bundle.putInt(GuestConstants.GUESTID,id)
+                intent.putExtras(bundle)
+
+                startActivity(intent)
+            }
+
+            override fun onDelete(id: Int) {
+                mViewModel.delete(id)
+                mViewModel.load()
+            }
+
+        }
+        mAdapter.attachListener(mListener)
+
         observer()
 
         return root
     }
 
-    override fun onResume(){
+    override fun onResume() {
         super.onResume()
-        allGuestsViewModel.load()
+        mViewModel.load()
     }
+
     private fun observer() {
-        allGuestsViewModel.guestList.observe(viewLifecycleOwner, Observer {
+        mViewModel.guestList.observe(viewLifecycleOwner, Observer {
             mAdapter.updateGuests(it)
 
         })
